@@ -14,6 +14,7 @@ class ViewsModule::ViewModuleImpl {
   };
 
 private:
+  std::chrono::seconds _timestamp_offset{0};
   bool _isFirstView = true;
   std::map<std::string, std::shared_ptr<ViewInfo>> _viewsStartTime;
 
@@ -49,7 +50,7 @@ private:
       }
     } else {
 
-      const std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+      const std::chrono::system_clock::time_point now = getTimestamp();
       const auto timestamp = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
       std::chrono::seconds dur = timestamp - v->startTime;
       duration = dur.count();
@@ -65,18 +66,25 @@ private:
       _viewsStartTime.erase(v->viewId);
     }
   }
-
+  std::chrono::system_clock::time_point getTimestamp() const {
+    return std::chrono::system_clock::now() - _timestamp_offset;
+  }
 public:
   std::shared_ptr<cly::LoggerModule> _logger;
   ViewModuleImpl(cly::CountlyDelegates *cly, std::shared_ptr<cly::LoggerModule> logger) : _cly(cly), _logger(logger) {}
 
   ~ViewModuleImpl() { _logger.reset(); }
 
+  void _setTimestampOffset(std::chrono::seconds offset) {
+    _timestamp_offset = offset;
+  }
+
   std::string _openView(const std::string &name, const std::map<std::string, std::string> &segmentation) {
     ViewModuleImpl::ViewInfo *v = new ViewModuleImpl::ViewInfo();
     v->name = name;
     v->viewId = cly::utils::generateEventID();
-    v->startTime = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch());
+    const auto timestamp = getTimestamp();
+    v->startTime = std::chrono::duration_cast<std::chrono::seconds>(timestamp.time_since_epoch());
 
     std::shared_ptr<ViewModuleImpl::ViewInfo> ptr(v);
 
@@ -117,6 +125,11 @@ ViewsModule::ViewsModule(cly::CountlyDelegates *cly, std::shared_ptr<cly::Logger
 }
 
 ViewsModule::~ViewsModule() { impl.reset(); }
+
+
+void ViewsModule::setTimestampOffset(std::chrono::seconds offset) {
+  impl->_setTimestampOffset(offset);
+}
 
 std::string ViewsModule::openView(const std::string &name, const std::map<std::string, std::string> &segmentation) {
 
