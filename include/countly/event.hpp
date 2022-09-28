@@ -12,8 +12,7 @@ public:
   Event(const std::string &key, size_t count, double sum);
   Event(const std::string &key, size_t count, double sum, double duration);
 
-  void setTimestamp();
-
+  void setTimestampOffset(std::chrono::seconds offset);
   void startTimer();
   void stopTimer();
 
@@ -26,11 +25,14 @@ public:
   }
 
   std::string serialize() const;
-
 private:
+  std::chrono::system_clock::time_point getTimestamp() const;
+  void setTimestamp();
+
   nlohmann::json object;
   bool timer_running;
   std::chrono::system_clock::time_point timestamp;
+  std::chrono::seconds timestamp_offset{0};
 };
 } // namespace cly
 #endif
