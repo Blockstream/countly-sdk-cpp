@@ -14,6 +14,8 @@ public:
   ~ViewsModule();
   ViewsModule(cly::CountlyDelegates *cly, std::shared_ptr<cly::LoggerModule> logger);
 
+  void setTimestampOffset(std::chrono::seconds offset);
+
   /**
    * Close view with id.
    *
