@@ -13,6 +13,8 @@ public:
   Event(const std::string &key, size_t count, double sum, double duration);
 
   void setTimestampOffset(std::chrono::seconds offset);
+  Event& stamp(std::chrono::system_clock::time_point timestamp);
+
   void startTimer();
   void stopTimer();
 

@@ -216,9 +216,9 @@ public:
   inline cly::ViewsModule &views() const { return *views_module.get(); }
   inline cly::CrashModule &crash() const { return *crash_module.get(); }
 
-  void RecordEvent(const std::string &key, int count) override { addEvent(cly::Event(key, count)); }
+  void RecordEvent(const std::string &key, int count) override { addEvent(cly::Event(key, count).stamp(getTimestamp())); }
 
-  void RecordEvent(const std::string &key, int count, double sum) override { addEvent(cly::Event(key, count, sum)); }
+  void RecordEvent(const std::string &key, int count, double sum) override { addEvent(cly::Event(key, count, sum).stamp(getTimestamp())); }
 
   void RecordEvent(const std::string &key, const std::map<std::string, std::string> &segmentation, int count) override {
     cly::Event event(key, count);
@@ -227,7 +227,7 @@ public:
       event.addSegmentation(key_value.first, key_value.second);
     }
 
-    addEvent(event);
+    addEvent(event.stamp(getTimestamp()));
   }
 
   void RecordEvent(const std::string &key, const std::map<std::string, std::string> &segmentation, int count, double sum) override {
@@ -237,7 +237,7 @@ public:
       event.addSegmentation(key_value.first, key_value.second);
     }
 
-    addEvent(event);
+    addEvent(event.stamp(getTimestamp()));
   }
 
   void RecordEvent(const std::string &key, const std::map<std::string, std::string> &segmentation, int count, double sum, double duration) override {
@@ -247,7 +247,7 @@ public:
       event.addSegmentation(key_value.first, key_value.second);
     }
 
-    addEvent(event);
+    addEvent(event.stamp(getTimestamp()));
   }
 
   /* Provide 'updateInterval' in seconds. */

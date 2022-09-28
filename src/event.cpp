@@ -23,6 +23,12 @@ Event::Event(const std::string &key, size_t count, double sum, double duration) 
   setTimestamp();
 }
 
+Event& Event::stamp(std::chrono::system_clock::time_point timestamp)
+{
+  object["timestamp"] = std::chrono::duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()).count();
+  return *this;
+}
+
 void Event::setTimestampOffset(std::chrono::seconds offset)
 {
   timestamp_offset = offset;
