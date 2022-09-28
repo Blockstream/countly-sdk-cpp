@@ -90,6 +90,8 @@ public:
 
   void setDeviceID(const std::string &value, bool same_user = false);
 
+  void setTimestampOffset(std::chrono::seconds offset);
+
   void start(const std::string &app_key, const std::string &host, int port = 0, bool start_thread = false);
 
   void startOnCloud(const std::string &app_key);
@@ -182,7 +184,7 @@ public:
 
   void updateRemoteConfigExcept(std::string *keys, size_t key_count);
 
-  static std::chrono::system_clock::time_point getTimestamp();
+  std::chrono::system_clock::time_point getTimestamp() const;
 
   std::string calculateChecksum(const std::string &salt, const std::string &data);
 
@@ -349,6 +351,8 @@ private:
 #else
   std::string database_path;
 #endif
+
+  std::chrono::seconds timestamp_offset{0};
 
   bool remote_config_enabled = false;
   nlohmann::json remote_config;
