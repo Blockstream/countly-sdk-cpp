@@ -256,7 +256,7 @@ void Countly::_sendIndependantLocationRequest() {
     data["ip_address"] = session_params["ip_address"].get<std::string>();
   }
 
-  const std::chrono::system_clock::time_point now = Countly::getTimestamp();
+  const std::chrono::system_clock::time_point now = getTimestamp();
   const auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
 
   if (!data.empty()) {
@@ -312,7 +312,7 @@ void Countly::_changeDeviceIdWithMerge(const std::string &value) {
   session_params["old_device_id"] = session_params["device_id"];
   session_params["device_id"] = value;
 
-  const std::chrono::system_clock::time_point now = Countly::getTimestamp();
+  const std::chrono::system_clock::time_point now = getTimestamp();
   const auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
   std::map<std::string, std::string> data = {
       {"app_key", session_params["app_key"].get<std::string>()},
@@ -412,6 +412,7 @@ void Countly::start(const std::string &app_key, const std::string &host, int por
   requestModule.reset(new RequestModule(configuration, logger, requestBuilder, storageModule));
   crash_module.reset(new cly::CrashModule(configuration, logger, requestModule, mutex));
   views_module.reset(new cly::ViewsModule(this, logger));
+  views_module->setTimestampOffset(timestamp_offset);
 
   bool result = true;
 #ifdef COUNTLY_USE_SQLITE
@@ -659,7 +660,7 @@ bool Countly::beginSession() {
     return true;
   }
 
-  const std::chrono::system_clock::time_point now = Countly::getTimestamp();
+  const std::chrono::system_clock::time_point now = getTimestamp();
   const auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
 
   std::map<std::string, std::string> data = {{"sdk_name", COUNTLY_SDK_NAME}, {"sdk_version", COUNTLY_SDK_VERSION}, {"timestamp", std::to_string(timestamp.count())}, {"app_key", session_params["app_key"].get<std::string>()}, {"device_id", session_params["device_id"].get<std::string>()},
@@ -692,7 +693,7 @@ bool Countly::beginSession() {
 
   requestModule->addRequestToQueue(data);
   session_params.erase("user_details");
-  last_sent_session_request = Countly::getTimestamp();
+  last_sent_session_request = getTimestamp();
   began_session = true;
   mutex->unlock();
 
@@ -785,7 +786,7 @@ void Countly::sendEventsToRQ(const nlohmann::json &events) {
 
 bool Countly::endSession() {
   log(LogLevel::INFO, "[Countly][endSession]");
-  const std::chrono::system_clock::time_point now = Countly::getTimestamp();
+  const std::chrono::system_clock::time_point now = getTimestamp();
   const auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
   const auto duration = std::chrono::duration_cast<std::chrono::seconds>(getSessionDuration(now));
 
@@ -806,7 +807,16 @@ bool Countly::endSession() {
   return true;
 }
 
-std::chrono::system_clock::time_point Countly::getTimestamp() { return std::chrono::system_clock::now(); }
+void Countly::setTimestampOffset(std::chrono::seconds offset) {
+    timestamp_offset = offset;
+    if (views_module) {
+      views_module->setTimestampOffset(offset);
+    }
+}
+
+std::chrono::system_clock::time_point Countly::getTimestamp() const {
+    return std::chrono::system_clock::now() - timestamp_offset;
+}
 
 int Countly::checkEQSize() {
   log(LogLevel::DEBUG, "[Countly][checkEQSize]");
@@ -1093,7 +1103,9 @@ std::chrono::system_clock::duration Countly::getSessionDuration(std::chrono::sys
   return duration;
 }
 
-std::chrono::system_clock::duration Countly::getSessionDuration() { return Countly::getSessionDuration(Countly::getTimestamp()); }
+std::chrono::system_clock::duration Countly::getSessionDuration() {
+  return getSessionDuration(getTimestamp());
+}
 
 void Countly::updateLoop() {
   log(LogLevel::DEBUG, "[Countly][updateLoop]");
