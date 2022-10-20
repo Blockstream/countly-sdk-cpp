@@ -176,6 +176,8 @@ public:
 
   void enableRemoteConfig();
 
+  using RemoteConfigCallback = std::function<void()>;
+  void setRemoteConfigCallback(RemoteConfigCallback cb);
   void updateRemoteConfig();
 
   nlohmann::json getRemoteConfigValue(const std::string &key);
@@ -355,6 +357,7 @@ private:
   std::chrono::seconds timestamp_offset{0};
 
   bool remote_config_enabled = false;
+  RemoteConfigCallback remote_config_callback;
   nlohmann::json remote_config;
 };
 } // namespace cly
