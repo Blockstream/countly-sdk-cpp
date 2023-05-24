@@ -32,7 +32,11 @@ endif()
 set(COUNTLY_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/include/countly.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/countly/constants.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/countly/countly_configuration.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/countly/event.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/countly/request_module.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/countly/request_builder.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/countly/storage_module_base.hpp
 
   ${CMAKE_CURRENT_SOURCE_DIR}/include/countly/logger_module.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/countly/crash_module.hpp
