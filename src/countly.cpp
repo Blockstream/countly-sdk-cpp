@@ -412,7 +412,7 @@ void Countly::start(const std::string &app_key, const std::string &host, int por
   requestModule.reset(new RequestModule(configuration, logger, requestBuilder, storageModule));
   crash_module.reset(new cly::CrashModule(configuration, logger, requestModule, mutex));
   views_module.reset(new cly::ViewsModule(this, logger));
-  views_module->setTimestampOffset(timestamp_offset);
+  views_module->setTimestampOffset(configuration->timestamp_offset);
 
   bool result = true;
 #ifdef COUNTLY_USE_SQLITE
@@ -808,14 +808,14 @@ bool Countly::endSession() {
 }
 
 void Countly::setTimestampOffset(std::chrono::seconds offset) {
-    timestamp_offset = offset;
+    configuration->timestamp_offset = offset;
     if (views_module) {
       views_module->setTimestampOffset(offset);
     }
 }
 
 std::chrono::system_clock::time_point Countly::getTimestamp() const {
-    return std::chrono::system_clock::now() - timestamp_offset;
+    return configuration->getTimestamp();
 }
 
 int Countly::checkEQSize() {

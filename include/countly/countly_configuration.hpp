@@ -72,9 +72,15 @@ struct CountlyConfiguration {
 
   nlohmann::json metrics;
 
+  std::chrono::seconds timestamp_offset{0};
+
   CountlyConfiguration(const std::string appKey, std::string serverUrl) {
     this->appKey = appKey;
     this->serverUrl = serverUrl;
+  }
+
+  std::chrono::system_clock::time_point getTimestamp() const {
+      return std::chrono::system_clock::now() - timestamp_offset;
   }
 };
 } // namespace cly

@@ -354,8 +354,6 @@ private:
   std::string database_path;
 #endif
 
-  std::chrono::seconds timestamp_offset{0};
-
   bool remote_config_enabled = false;
   RemoteConfigCallback remote_config_callback;
   nlohmann::json remote_config;
