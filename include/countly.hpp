@@ -176,7 +176,7 @@ public:
 
   void enableRemoteConfig();
 
-  using RemoteConfigCallback = std::function<void()>;
+  using RemoteConfigCallback = std::function<void(bool)>;
   void setRemoteConfigCallback(RemoteConfigCallback cb);
   void updateRemoteConfig();
 

@@ -1145,7 +1145,7 @@ void Countly::_fetchRemoteConfig(const std::map<std::string, std::string> &data)
     remote_config = response.data;
   }
   if (remote_config_callback) {
-    remote_config_callback();
+    remote_config_callback(response.success);
   }
   mutex->unlock();
 }
