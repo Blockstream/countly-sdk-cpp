@@ -181,6 +181,7 @@ public:
   void updateRemoteConfig();
 
   nlohmann::json getRemoteConfigValue(const std::string &key);
+  std::string getRemoteConfigValueString(const std::string &key);
 
   void updateRemoteConfigFor(std::string *keys, size_t key_count);
 

@@ -1180,6 +1180,13 @@ nlohmann::json Countly::getRemoteConfigValue(const std::string &key) {
   return value;
 }
 
+std::string Countly::getRemoteConfigValueString(const std::string &key) {
+  mutex->lock();
+  nlohmann::json value = remote_config[key];
+  mutex->unlock();
+  return value.dump();
+}
+
 void Countly::_updateRemoteConfigWithSpecificValues(const std::map<std::string, std::string> &data) {
   HTTPResponse response = requestModule->sendHTTP("/o/sdk", requestBuilder->serializeData(data));
   mutex->lock();
